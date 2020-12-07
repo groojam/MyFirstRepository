@@ -1,22 +1,8 @@
-"""
-* PMS7003 데이터 수신 프로그램
-* 수정 : 2018. 11. 19
-* 제작 : eleparts 부설연구소
-* SW ver. 1.0.2
 
-> 관련자료
-파이썬 라이브러리
-https://docs.python.org/3/library/struct.html
-
-점프 투 파이썬
-https://wikidocs.net/book/1
-
-PMS7003 datasheet
-http://eleparts.co.kr/data/_gextends/good-pdf/201803/good-pdf-4208690-1.pdf
-"""
 import serial
 import struct
 import time
+import Adafruit_DHT
 
 
 class PMS7003(object):
@@ -107,7 +93,7 @@ class PMS7003(object):
       else:
         print("Header err")
     else:
-      print("Protol err")
+      print("Protocol err")
 
     return False 
 
@@ -168,7 +154,17 @@ if __name__=='__main__':
     
     ser.flushInput()
     buffer = ser.read(1024)
-
+    
+    #
+    sensor = Adafruit_DHT.DHT11
+    pin = 17
+    humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
+    if humidity is not None and temperature is not None:
+        print('Temp={0:0.1f}*C  Humidity={1:0.1f}%'.format(temperature, humidity))
+    else:
+        print('Failed to get reading. Try again!')
+        
+        
     if(dust.protocol_chk(buffer)):
     
       print("DATA read success")
