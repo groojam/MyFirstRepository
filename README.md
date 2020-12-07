@@ -3,22 +3,6 @@
 
 **라즈베리파이**에서 사용되는 **PMS7003/PMS7003M**의 **Python**예제 코드입니다.  
 
-엘레파츠에서 두 먼지센서는 아래 링크에서 만나보실 수 있습니다.  
-PMS7003 : https://www.eleparts.co.kr/EPXHUUNM  
-PMS7003M : https://www.eleparts.co.kr/EPXHWJ6L  
-
-
-## 먼지센서 연결 방법
-
-- GPIO UART 사용하기  
-라즈베리파이 UART 활성화 및 사용법  
-https://blog.naver.com/elepartsblog/221345203230  
-  
-- USB to UART (TTL) 변환케이블 사용하기  
-USB to UART 변환케이블 사용법  
-https://blog.naver.com/elepartsblog/221347040698  
-  
-  
 ## PMS7003.py
 
 예제 코드 파일입니다.
