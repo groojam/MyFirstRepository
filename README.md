@@ -12,7 +12,8 @@
 # USE PORT  
 SERIAL_PORT = UART  
 ```
-위 UART 부분을 PMS7003의 연결방법에 맞게 수정한 뒤  
+!!!위 UART 부분을 USB0으로 수정
+
 ``sudo python3 PMS7003.py``  
 위 명령어로 실행해 주시면 Terminal창에서 데이터를 받아볼 수 있습니다.  
 기본값 : UART = '/dev/ttyAMA0'  
