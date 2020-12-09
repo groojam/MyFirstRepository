@@ -16,6 +16,8 @@ Basic Echobot example, repeats messages.
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
+import Micro_Dust
+
 import serial
 import struct
 import time
@@ -42,10 +44,14 @@ def now(update: Update, context: CallbackContext) -> None:
     update.message.reply_text('온도={0:0.1f}*C  습도={1:0.1f}% \n'.format(temperature, humidity))
     update.message.reply_text('미세먼지\n PM 1.0 : %s, PM 2.5 : %s, PM 10.0 : %s' % (dusts[0],dusts[1],dusts[2]))
 
+def MicroDust(update: Update, context: CallbackContext) -> None:
+    """Send a message when the command /start is issued."""
+    md = Micro_Dust.MicroDust()
+    update.message.reply_text('시간: {0}\n미세먼지(PM10)농도 : {1}\n미세먼지(PM2.5)농도 : {2}'.format(md[0],md[1],md[2]))
 
 def help_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /help is issued."""
-    update.message.reply_text('/now를 입력하시면 센서 값이 전송됩니다!')
+    update.message.reply_text('/now를 입력하시면 센서 값이 전송됩니다!\n/MicroDust를 입력하시면 인천 미추홀의 미세먼지 정보가 전송됩니다!')
 
 
 def main():
@@ -60,6 +66,7 @@ def main():
 
     # on different commands - answer in Telegram
     dispatcher.add_handler(CommandHandler("now", now))
+    dispatcher.add_handler(CommandHandler("MicroDust", MicroDust))
     dispatcher.add_handler(CommandHandler("help", help_command))
 
     # Start the Bot
