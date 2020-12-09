@@ -16,6 +16,11 @@ Basic Echobot example, repeats messages.
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
+import serial
+import struct
+import time
+import Adafruit_DHT
+import PMS7003
 
 import logging
 
@@ -32,14 +37,15 @@ logger = logging.getLogger(__name__)
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
-def start(update: Update, context: CallbackContext) -> None:
+def now(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
-    update.message.reply_text('여기에 센서 값 전송하는 메시지 쓰기')
+    update.message.reply_text('온도={0:0.1f}*C  습도={1:0.1f}% \n'.format(temperature, humidity))
+    update.message.reply_text('미세먼지\n PM 1.0 : %s, PM 2.5 : %s, PM 10.0 : %s' % (dusts[0],dusts[1],dusts[2]))
 
 
 def help_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /help is issued."""
-    update.message.reply_text('/start를 입력하시면 센서 값이 전송됩니다!')
+    update.message.reply_text('/now를 입력하시면 센서 값이 전송됩니다!')
 
 
 def main():
@@ -53,7 +59,7 @@ def main():
     dispatcher = updater.dispatcher
 
     # on different commands - answer in Telegram
-    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler("now", now))
     dispatcher.add_handler(CommandHandler("help", help_command))
 
     # Start the Bot
@@ -64,6 +70,46 @@ def main():
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
 
+# UART / USB Serial : 'dmesg | grep ttyUSB'
+USB0 = '/dev/ttyUSB0'
+UART = '/dev/ttyAMA0'
+
+# USE PORT
+SERIAL_PORT = USB0
+
+# Baud Rate
+Speed = 9600
 
 if __name__ == '__main__':
+    #serial setting 
+    ser = serial.Serial(SERIAL_PORT, Speed, timeout = 1)
+
+    dust = PMS7003.PMS7003()
+
+    while True:
+        ser.flushInput()
+        buffer = ser.read(1024)
+
+        sensor = Adafruit_DHT.DHT11
+        pin = 17
+        humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
+
+        if humidity is not None and temperature is not None:
+            print('Temp={0:0.1f}*C  Humidity={1:0.1f}%'.format(temperature, humidity))
+        else:
+            print('Failed to get reading. Try again!')
+
+        if(dust.protocol_chk(buffer)):
+            print("DATA read success")
+
+            # print data
+            dust.print_serial(buffer)
+
+            #get dust data
+            dusts = dust.get_data(buffer)
+            print(dusts)
+
+        else:
+            print("DATA read fail...")
     main()
+    ser.close()
