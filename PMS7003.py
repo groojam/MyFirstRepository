@@ -108,7 +108,17 @@ class PMS7003(object):
 
     return data
 
-
+  
+  #get dust data
+  def get_data(self, buffer):
+    data = self.unpack_data(buffer)
+      
+    pm1 = data[self.DUST_PM1_0_ATM]
+    pm2_5 = data[self.DUST_PM2_5_ATM]
+    pm10_0 = data[self.DUST_PM10_0_ATM]
+      
+    return pm1, pm2_5, pm10_0
+  
   def print_serial(self, buffer):
     
     chksum = self.chksum_cal(buffer)
@@ -131,12 +141,13 @@ class PMS7003(object):
 
 
 
+
 # UART / USB Serial : 'dmesg | grep ttyUSB'
 USB0 = '/dev/ttyUSB0'
 UART = '/dev/ttyAMA0'
 
 # USE PORT
-SERIAL_PORT = UART
+SERIAL_PORT = USB0
 
 # Baud Rate
 Speed = 9600
@@ -171,6 +182,10 @@ if __name__=='__main__':
     
       # print data
       dust.print_serial(buffer)
+      
+      #get dust data
+      dusts = dust.get_data(buffer)
+      print(dusts)
       
     else:
 
