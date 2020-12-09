@@ -111,5 +111,5 @@ if __name__ == '__main__':
 
         else:
             print("DATA read fail...")
-    main()
+        main()
     ser.close()
