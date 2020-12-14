@@ -34,6 +34,6 @@ def relay(self, ctrl, onoff):
         print("Window OFF")
     elif (ctrl == 3 and onoff == 1):
         GPIO.output(window_GPIO, GPIO.HIGH)
-        print("Window O")
+        print("Window ON")
         
 GPTO.cleanup()
