@@ -16,7 +16,8 @@ bot.
 """
 import Micro_Dust # 미세먼지 API 파이썬 파일
 import PMS7003 # 미세먼지 센서 값 가져오는 파이썬 파일
-import StepMotor # 모터를 제어하는 파이썬 파일 
+import StepMotor # 모터를 제어하는 파이썬 파일
+import Relay # 릴레이로 공기청정기 및 제습기를 제어하는 파이썬 파일
 
 import serial
 import struct
@@ -59,7 +60,11 @@ def help_command(update: Update, context: CallbackContext) -> None:
     update.message.reply_text('/now를 입력하시면 센서 값이 전송됩니다!\n\n' +
                               '/MicroDust를 입력하시면 인천 미추홀의 미세먼지 정보가 전송됩니다!\n\n' +
                               '/winopen을 입력하시면 창문이 열립니다!\n\n' +
-                              'winclose를 입력하시면 창문이 닫힙니다!')
+                              '/winclose를 입력하시면 창문이 닫힙니다!\n\n' +
+                              '/airon을 입력하시면 공기청정기가 작동됩니다!\n\n' +
+                              '/airoff를 입력하시면 공기청정기의 작동이 멈춥니다!\n\n' +
+                              '/dehumidon을 입력하시면 제습기가 작동됩니다!\n\n' +
+                              '/dehumidoff를 입력하시면 제습기의 작동이 멈춥니다!')
 
 def WinOpen(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
@@ -73,6 +78,30 @@ def WinClose(update: Update, context: CallbackContext) -> None:
     StepMotor.window('close')
     update.message.reply_text('창문이 닫혔습니다!')
 
+def AirOn(update: Update, context: CallbackContext) -> None:
+    """Send a message when the command /start is issued."""
+    update.message.reply_text('공기청정기를 작동시킵니다.')
+    Relay.relay(1, 1)
+    update.message.reply_text('공기청정기가 작동되었습니다!')
+
+def AirOff(update: Update, context: CallbackContext) -> None:
+    """Send a message when the command /start is issued."""
+    update.message.reply_text('공기청정기 작동을 멈춤니다.')
+    Relay.relay(1, 0)
+    update.message.reply_text('공기청정기 작동이 멈췄습니다!')
+
+def DehumidOn(update: Update, context: CallbackContext) -> None:
+    """Send a message when the command /start is issued."""
+    update.message.reply_text('제습기를 작동시킵니다.')
+    Relay.relay(2, 1)
+    update.message.reply_text('제습기가 작동되었습니다!')
+
+def DehumidOff(update: Update, context: CallbackContext) -> None:
+    """Send a message when the command /start is issued."""
+    update.message.reply_text('제습기 작동을 멈춤니다.')
+    Relay.relay(2, 0)
+    update.message.reply_text('제습기 작동이 멈췄습니다!')
+
 def main():
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
@@ -84,11 +113,15 @@ def main():
     dispatcher = updater.dispatcher
 
     # on different commands - answer in Telegram
-    dispatcher.add_handler(CommandHandler("now", now))
-    dispatcher.add_handler(CommandHandler("MicroDust", MicroDust))
-    dispatcher.add_handler(CommandHandler("winopen", WinOpen))
-    dispatcher.add_handler(CommandHandler("winclose", WinClose))
-    dispatcher.add_handler(CommandHandler("help", help_command))
+    dispatcher.add_handler(CommandHandler("now", now)) # 집에서 측정한 온도, 습도, 미세먼지 측정값
+    dispatcher.add_handler(CommandHandler("MicroDust", MicroDust)) # 인천 미추홀구에 있는 관측소에서 측정한 외부의 미세먼지 측정값
+    dispatcher.add_handler(CommandHandler("winopen", WinOpen)) # 창문을 연다.
+    dispatcher.add_handler(CommandHandler("winclose", WinClose)) # 창문을 닫는다.
+    dispatcher.add_handler(CommandHandler("airon", AirOn)) # 공기청정기를 작동시킨다.
+    dispatcher.add_handler(CommandHandler("airoff", AirOff)) # 공기청정기의 작동을 멈춘다.
+    dispatcher.add_handler(CommandHandler("dehumidon", DehumidOn)) # 제습기를 작동시킨다.
+    dispatcher.add_handler(CommandHandler("dehumidoff", DehumidOff)) # 제습기의 작동을 멈춘다.
+    dispatcher.add_handler(CommandHandler("help", help_command)) # 명령어들에 대한 도움말을 제공합니다.
 
     # Start the Bot
     updater.start_polling()
