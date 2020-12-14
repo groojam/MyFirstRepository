@@ -14,6 +14,8 @@ GPIO.setup(air_GPIO, GPIO.OUT)
 GPIO.setup(dehumid_GPIO, GPIO.OUT)
 GPIO.setup(window_GPIO, GPIO.OUT)
 
+#공기청정기 1, 제습기 2, 창문모터 3
+#on/off 각각 1, 0
 def relay(self, ctrl, onoff):
     if (ctrl == 1 and onoff == 0):
         GPIO.output(air_GPIO, GPIO.LOW)
@@ -27,11 +29,11 @@ def relay(self, ctrl, onoff):
     elif (ctrl == 2 and onoff == 1):
         GPIO.output(dehumid_GPIO, GPIO.HIGH)
         print("Dehumidifier  ON")
-    elif (pctrl == 3 and onoff == 0):
+    elif (ctrl == 3 and onoff == 0):
         GPIO.output(window_GPIO, GPIO.LOW)
         print("Window OFF")
-    elif (pctrl == 3 and onoff == 1):
+    elif (ctrl == 3 and onoff == 1):
         GPIO.output(window_GPIO, GPIO.HIGH)
-        print("Window OFF")
+        print("Window O")
         
 GPTO.cleanup()
