@@ -78,29 +78,29 @@ def WinClose(update: Update, context: CallbackContext) -> None:
     StepMotor.window('close')
     update.message.reply_text('창문이 닫혔습니다!')
 
-def AirOn(update: Update, context: CallbackContext) -> None:
-    """Send a message when the command /start is issued."""
-    update.message.reply_text('공기청정기를 작동시킵니다.')
-    Relay.relay(1, 1)
-    update.message.reply_text('공기청정기가 작동되었습니다!')
-
 def AirOff(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
     update.message.reply_text('공기청정기 작동을 멈춤니다.')
-    Relay.relay(1, 0)
-    update.message.reply_text('공기청정기 작동이 멈췄습니다!')
+    Relay.relay(1, 1)
+    update.message.reply_text('공기청정기가 작동이 멈췄습니다!')
 
-def DehumidOn(update: Update, context: CallbackContext) -> None:
+def AirOn(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
-    update.message.reply_text('제습기를 작동시킵니다.')
-    Relay.relay(2, 1)
-    update.message.reply_text('제습기가 작동되었습니다!')
+    update.message.reply_text('공기청정기를 작동시킵니다.')
+    Relay.relay(1, 0)
+    update.message.reply_text('공기청정기 작동이 되었습니다!')
 
 def DehumidOff(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
     update.message.reply_text('제습기 작동을 멈춤니다.')
+    Relay.relay(2, 1)
+    update.message.reply_text('제습기가 작동이 멈췄습니다!')
+
+def DehumidOn(update: Update, context: CallbackContext) -> None:
+    """Send a message when the command /start is issued."""
+    update.message.reply_text('제습기를 작동시킵니다.')
     Relay.relay(2, 0)
-    update.message.reply_text('제습기 작동이 멈췄습니다!')
+    update.message.reply_text('제습기 작동되었습니다!')
 
 def main():
     """Start the bot."""
