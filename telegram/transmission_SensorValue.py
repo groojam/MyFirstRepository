@@ -6,18 +6,28 @@
 
 """
 Simple Bot to reply to Telegram messages.
-
 First, a few handler functions are defined. Then, those functions are passed to
 the Dispatcher and registered at their respective places.
 Then, the bot is started and runs until we press Ctrl-C on the command line.
-
 Usage:
 Basic Echobot example, repeats messages.
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
+import Micro_Dust # 미세먼지 API 파이썬 파일
+import PMS7003 # 미세먼지 센서 값 가져오는 파이썬 파일
+import StepMotor # 모터를 제어하는 파이썬 파일 
+
+import serial
+import struct
+import time
+import Adafruit_DHT
 
 import logging
+
+import RPi.GPIO as GPIO
+import time
+from collections import deque
 
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
@@ -32,28 +42,52 @@ logger = logging.getLogger(__name__)
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
-def start(update: Update, context: CallbackContext) -> None:
+def now(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
-    update.message.reply_text('여기에 센서 값 전송하는 메시지 쓰기')
+    update.message.reply_text('집에서 측정한 온도, 습도, 미세먼지 측정값입니다.')
+    update.message.reply_text('온도={0:0.1f}*C  습도={1:0.1f}% \n'.format(temperature, humidity))
+    update.message.reply_text('미세먼지(PM10)농도 : %s\n초미세먼지(PM2.5)농도 : %s' % (dusts[2],dusts[1]))
 
+def MicroDust(update: Update, context: CallbackContext) -> None:
+    """Send a message when the command /start is issued."""
+    md = Micro_Dust.MicroDust()
+    update.message.reply_text('인천 미추홀구에 있는 관측소에서 측정한 외부의 미세먼지 측정값입니다.')
+    update.message.reply_text('미세먼지(PM10)농도 : {0}\n초미세먼지(PM2.5)농도 : {1}'.format(md[0],md[1]))
 
 def help_command(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /help is issued."""
-    update.message.reply_text('/start를 입력하시면 센서 값이 전송됩니다!')
+    update.message.reply_text('/now를 입력하시면 센서 값이 전송됩니다!\n\n' +
+                              '/MicroDust를 입력하시면 인천 미추홀의 미세먼지 정보가 전송됩니다!\n\n' +
+                              '/winopen을 입력하시면 창문이 열립니다!\n\n' +
+                              'winclose를 입력하시면 창문이 닫힙니다!')
 
+def WinOpen(update: Update, context: CallbackContext) -> None:
+    """Send a message when the command /start is issued."""
+    update.message.reply_text('창문을 열겠습니다.')
+    StepMotor.window('open')
+    update.message.reply_text('창문이 열렸습니다!')
+
+def WinClose(update: Update, context: CallbackContext) -> None:
+    """Send a message when the command /start is issued."""
+    update.message.reply_text('창문을 닫겠습니다.')
+    StepMotor.window('close')
+    update.message.reply_text('창문이 닫혔습니다!')
 
 def main():
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater("1420071822:AAHAiYgY0LDXa3lgaPv8b7WOM0AolAV4RPY", use_context=True)
+    updater = Updater("1217163377:AAEfbmfoPU-T6awKI9ZBR3X3wBLSrYn-j8s", use_context=True)
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
 
     # on different commands - answer in Telegram
-    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler("now", now))
+    dispatcher.add_handler(CommandHandler("MicroDust", MicroDust))
+    dispatcher.add_handler(CommandHandler("winopen", WinOpen))
+    dispatcher.add_handler(CommandHandler("winclose", WinClose))
     dispatcher.add_handler(CommandHandler("help", help_command))
 
     # Start the Bot
@@ -64,6 +98,46 @@ def main():
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
 
+# UART / USB Serial : 'dmesg | grep ttyUSB'
+USB0 = '/dev/ttyUSB0'
+UART = '/dev/ttyAMA0'
+
+# USE PORT
+SERIAL_PORT = USB0
+
+# Baud Rate
+Speed = 9600
 
 if __name__ == '__main__':
-    main()
+    #serial setting 
+    ser = serial.Serial(SERIAL_PORT, Speed, timeout = 1)
+
+    dust = PMS7003.PMS7003()
+
+    while True:
+        ser.flushInput()
+        buffer = ser.read(1024)
+
+        sensor = Adafruit_DHT.DHT11
+        pin = 17
+        humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
+
+        if humidity is not None and temperature is not None:
+            print('Temp={0:0.1f}*C  Humidity={1:0.1f}%'.format(temperature, humidity))
+        else:
+            print('Failed to get reading. Try again!')
+
+        if(dust.protocol_chk(buffer)):
+            print("DATA read success")
+
+            # print data
+            dust.print_serial(buffer)
+
+            #get dust data
+            dusts = dust.get_data(buffer)
+            print(dusts)
+
+        else:
+            print("DATA read fail...")
+        main()
+    ser.close()
