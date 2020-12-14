@@ -3,6 +3,8 @@
 1. 데이터는 공공데이터 포털에서 제공하는 오픈 API에서 가져왔습니다.
 2. 한국환경공단에서 제공하는 데이터이며 XML형태입니다.
 
+[오픈API 상세페이지 가기](https://www.data.go.kr/tcs/dss/selectApiDataDetailView.do?publicDataPk=15000581)
+
 
 <img src="https://user-images.githubusercontent.com/38938145/101351119-6fcea280-38d3-11eb-8b02-5bd2920aaa0e.png"></img>
 * 데이터는 실시간 정보이며 10분마다 갱신됩니다.
