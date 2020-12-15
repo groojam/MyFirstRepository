@@ -1,4 +1,4 @@
-transmission_SensorValue.py
+ControlWithTelegram.py
 ======================
 * 텔레그램으로 미세먼지, 온습도의 데이터를 받고 창문, 공기청정기, 제습기를 텔레그램으로 제어할 수 있도록 만든 코드입니다.
 
@@ -13,7 +13,7 @@ transmission_SensorValue.py
 
 ***
 ### 실행 방법
-* python3 transmission_SensorValue.py 로 실행한다.
+* python3 ControlWithTelegram.py 로 실행한다.
 * 토큰을 넣었던 텔레그램 봇으로 메시지가 전송된다.
 * 사용자가 텔레그램에서 /now 입력 시 센서에서 측정한 미세먼지 및 온습도 값이 전송되도록 한다.
 * 사용자가 텔레그램에서 /MicroDust 입력 시 인천 미추홀구에 있는 관측소에서 측정한 미세먼지 데이터를 전송한다.
