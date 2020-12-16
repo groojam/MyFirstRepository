@@ -17,6 +17,11 @@
 ## 전체적인 구조
 <img src="https://user-images.githubusercontent.com/38938145/102112905-bb58f180-3e7b-11eb-8dce-abee8ba9e0a7.png"/>
 
+## 텔레그램 결과 화면
+<img src="https://user-images.githubusercontent.com/38938145/102322057-d2096080-3fc1-11eb-8d33-adc99b9648ca.jpeg"/>
+
+<img src="https://user-images.githubusercontent.com/38938145/102322167-fbc28780-3fc1-11eb-9d3c-07754db7ece6.jpeg"/>
+
 ***
 # PMS7003 프로토콜 예제 코드
 
